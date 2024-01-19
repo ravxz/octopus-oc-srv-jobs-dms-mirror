@@ -73,7 +73,7 @@ class DmsMirrorInitTestSuite(DmsMirrorTestBase):
                 'queue_cnt': '\x63dt.dl\x63ontents.input',
                 'log_level': 20,
                 'config_file': os.path.join(os.getcwd(), 'config.json'),
-                'retries_count': 5, 
+                'retries_count': 5,
                 'mvn_prefix': self.env.get('MVN_PREFIX'),
                 'mvn_url': self.env.get('MVN_URL'),
                 'mvn_user': self.env.get('MVN_USER'),
@@ -168,11 +168,11 @@ class DmsMirrorV2TestSuite(DmsMirrorTestBase):
 
             for _artifact_type, _tgtGavTemplate in _params.get("tgtGavTemplate").items():
                 if suffix in _tgtGavTemplate:
-                    return (_component, 
+                    return (_component,
                             self.dmsmirror._get_static_ci_type(_artifact_type) or _params["ci_type"],
                             _artifact_type)
 
-    def _process_artifact_asserts(self, component, version, artifact, artifact_type, 
+    def _process_artifact_asserts(self, component, version, artifact, artifact_type,
                                   ci_type, substitutes, artifact_info=dict()):
         _tgt_gav = self.dmsmirror._components[component]["tgtGavTemplate"][artifact_type].replace("\\", "")
         _tgt_gav = Template(_tgt_gav).substitute(substitutes)
@@ -326,7 +326,7 @@ class DmsMirrorV2TestSuite(DmsMirrorTestBase):
                 "cl": "",
                 "prefix": self.args.mvn_prefix}
         self._process_artifact_asserts(_component, _version, _artifact, _artifact_type, _ci_type, _substitutes)
-        
+
     def test_copy_artifact(self):
         self.assertEqual(self.args.dms_api_version, 2)
         _component = "component"
@@ -418,7 +418,7 @@ class DmsMirrorV3TestSuite(DmsMirrorV2TestSuite):
                     "classifier": _classifier},
                 "repositoryType":"MAVEN"}
         # with info
-        self._process_artifact_asserts(_component, _version, _artifact, _artifact_type, 
+        self._process_artifact_asserts(_component, _version, _artifact, _artifact_type,
                                        _ci_type, _substitutes, _artifact_info)
         # without info
         self._process_artifact_asserts(_component, _version, _artifact, _artifact_type, _ci_type, _substitutes)
@@ -599,7 +599,7 @@ class DmsMirrorV3TestSuite(DmsMirrorV2TestSuite):
                                        _ci_type, _substitutes, _artifact_info)
         # without info
         self._process_artifact_asserts(_component, _version, _artifact, _artifact_type, _ci_type, _substitutes)
-        
+
     def test_copy_artifact(self):
         self.assertEqual(self.args.dms_api_version, 3)
         _component = "component"
