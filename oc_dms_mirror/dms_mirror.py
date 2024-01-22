@@ -38,7 +38,7 @@ class DmsMirror(object):
         Log a message for multiprocessing: append process name
         """
         return ': '.join([f"[{self.__process_name}]", message])
-    
+
     @property
     def queue_client(self):
         if not self._queue_client:
@@ -185,7 +185,7 @@ class DmsMirror(object):
                 "Try to update missing components using DMS API v3 detailed call"))
 
             # we have to raise an exception if "id" is not present - it is a crime!
-            _info = self.dms_client.get_artifact_info(component, version, artifact["id"])
+            _info = self._make_dms_api_call_with_retries(self.dms_client.get_artifact_info, component, version, artifact["id"])
             _result.update({
                 "n": _result.get("n") or _info.get("gav", dict()).get("artifactId") or "",
                 "p": _result.get("p") or _info.get("gav", dict()).get("packaging") or "",
@@ -249,7 +249,7 @@ class DmsMirror(object):
         _tgt_gav = Template(_gav_template).substitute(self._make_gav_substitute(component, version, artifact))
         _tgt_gav = re.sub('[^\w\-\.\:_]+', "_", _tgt_gav)
         logging.info(self.__log_msg(f"Target GAV: [{component}:{_artifact_type}:{version}] ==> [{_tgt_gav}]"))
-        
+
         if self.mvn_client.exists(_tgt_gav, repo=self._args.mvn_download_repo):
             logging.info(self.__log_msg(
                 f"Already exists, skipping: [{component}:{_artifact_type}:{version}] ==> [{_tgt_gav}]"))
@@ -287,14 +287,14 @@ class DmsMirror(object):
         _tgt_file = tempfile.TemporaryFile(mode='w+b')
         if hasattr(self.dms_client, "download_component"):
             logging.info(self.__log_msg(f"Downloading component: [{component}:{version}:{artifact['type']}]"))
-            self.dms_client.download_component(component, version, artifact["id"], write_to=_tgt_file)
+            self._make_dms_api_call_with_retries(self.dms_client.download_component, component, version, artifact["id"], write_to=_tgt_file)
         elif hasattr(self.dms_client, "get_gav"):
             logging.debug(self.__log_msg(f"Getting GAV from DMS: [{component}:{version}:{artifact['type']}]"))
             _src_gav = self._make_dms_api_call_with_retries(
-                    self.dms_client.get_gav, component, version, 
+                    self.dms_client.get_gav, component, version,
                     artifact["type"], artifact["name"], artifact["classifier"])
             logging.info(self.__log_msg(f"Downloading source GAV: [{_src_gav}]"))
-            self.mvn_client.cat(_src_gav, repo=self._args.mvn_download_repo, 
+            self.mvn_client.cat(_src_gav, repo=self._args.mvn_download_repo,
                                 stream=True, binary=True, write_to=_tgt_file)
 
         _tgt_file.seek(0, os.SEEK_SET)
@@ -313,7 +313,13 @@ class DmsMirror(object):
         _attempt = 0
         while True:
             _attempt += 1
-            logging.debug(self.__log_msg(f"{method.__name__}: attempt [{_attempt}]"))
+            if hasattr(method, '__name__'):
+                _method_name = method.__name__
+            elif hasattr(method, '__func__'):
+                _method_name = method.__func__.__name__
+            else:
+                _method_name = 'Unknown method'
+            logging.debug(self.__log_msg(f"{_method_name}: attempt [{_attempt}]"))
             try:
                 return method(*args, **kwargs)
             except self.__errors as _err:
@@ -364,7 +370,7 @@ class DmsMirror(object):
         # DMS arguments
         parser.add_argument("--dms-api-version", dest="dms_api_version", type=int,
                             help="DMS REST API version to use", default=2, choices=[2,3])
-        parser.add_argument("--dms-crs-url", dest="dms_crs_url", type=str, 
+        parser.add_argument("--dms-crs-url", dest="dms_crs_url", type=str,
                             help="DMS Component Registry URL (necessary for DMS API v2)",
                             default=os.getenv("DMS_CRS_URL"))
         parser.add_argument("--dms-token", dest="dms_token", type=str, help="DMS authorization token",
@@ -396,7 +402,7 @@ class DmsMirror(object):
 
         # just log the arguments
         for _k, _v in self._args.__dict__.items():
-            _display_value = _v 
+            _display_value = _v
 
             if _v and any([_k.endswith('password'), _k.endswith('token')]):
                 _display_value = '*'*len(_v)
@@ -413,7 +419,7 @@ class DmsMirror(object):
             self._components = json.load(_config)
 
         logging.info(self.__log_msg(f"Components to process: {len(self._components)}"))
-    
+
         with multiprocessing.Pool() as pool:
             _exceptions = pool.map(self.process_component, self._components)
 
@@ -438,7 +444,7 @@ class DmsMirror(object):
         __start_time = time.time()
 
         _exceptions = self.run()
-    
+
         __elapsed = time.time() - __start_time
         logging.info(self.__log_msg(f"Finished. Elapsed time: {__elapsed}"))
 
