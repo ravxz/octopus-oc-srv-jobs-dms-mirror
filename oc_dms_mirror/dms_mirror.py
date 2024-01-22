@@ -18,7 +18,6 @@ from oc_cdtapi import NexusAPI, DmsAPI
 
 from oc_cdtapi.API import HttpAPIError
 from requests.exceptions import ConnectionError
-from requests.exceptions import JSONDecodeError
 
 class DmsMirror(object):
     """
@@ -28,7 +27,7 @@ class DmsMirror(object):
         """
         Basic initialization
         """
-        self.__errors = (ConnectionError, HttpAPIError, KeyError, JSONDecodeError)
+        self.__errors = (ConnectionError, HttpAPIError, KeyError)
         self._dms_client = None
         self._mvn_client = None
         self._queue_client = None
