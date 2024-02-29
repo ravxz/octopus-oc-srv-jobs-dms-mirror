@@ -1,20 +1,18 @@
 import json
 from flask import Response, request
 from . import dms_mirror_bp
-from ..dms_mirror import DmsMirror
+from oc_dms_mirror.dms_mirror import DmsMirror
 import logging
 
 
 def get_dms_mirror():
     _dm = DmsMirror()
     _parser = _dm.basic_args()
+    _parser.add_argument("--app-bind", dest="app_bind", type=str, help="<host:port> application binding",
+                         default='0.0.0.0:5400')
+    _parser.add_argument("--app-timeout", dest="app_timeout", type=str, help="Application response timeout", default=300)
+    _parser.add_argument("--app-workers", dest="app_workers", type=int, help="Amount of application workers", default=10)
     _args = _parser.parse_args()
-
-    if hasattr(_args, "log_level"):
-        logging.basicConfig(
-            format="%(pathname)s: %(asctime)-15s: %(levelname)s: %(funcName)s: %(lineno)d: %(message)s",
-            level=_args.log_level)
-        logging.info(_dm.__log_msg(f"Logging level is set to {_args.log_level}"))
 
     _dm.setup_from_args(_args)
     return _dm
@@ -41,9 +39,9 @@ def response_json(code, data):
 @dms_mirror_bp.route('/register-component-version-artifact', methods=['POST'])
 def register_component_version_artifact():
     """
-    Endpoint returning map of client: lang by given list of clients
+    Endpoint performing component/version sync with DMS on demand.
     """
-    logging.info("POST /register-component-version-artifact from [%s]" % request.remote_addr)
+    logging.info(f"POST {request.url_rule.rule} from [{request.remote_addr}]")
     try:
         _component = request.json.get('component')
         _version = request.json.get('version')
