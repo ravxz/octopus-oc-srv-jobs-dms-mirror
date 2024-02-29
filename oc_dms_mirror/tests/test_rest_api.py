@@ -18,8 +18,10 @@ class RestApiTestSuite(unittest.TestCase):
             self.test_client = app.test_client()
 
     def test_register_component_version_artifact(self):
-        with unittest.mock.patch('oc_dms_mirror.dms_mirror.DmsMirror') as _dmsMirror:
+        with unittest.mock.patch('oc_dms_mirror.rest_api.app.routes.get_dms_mirror') as _get_dms_mirror:
+            _dmsMirror = unittest.mock.MagicMock()
             _dmsMirror.process_version = unittest.mock.MagicMock()
+            _get_dms_mirror.return_value = _dmsMirror
             self.create_app()
 
             data = {
@@ -30,6 +32,6 @@ class RestApiTestSuite(unittest.TestCase):
             }
             response = self.test_client.post("/register-component-version-artifact", json=data)
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.json.result, 'Success')
+            self.assertEqual(response.json.get('result'), 'Success')
 
             _dmsMirror.process_version.assert_called_once_with("my_version", "my_component")
