@@ -22,6 +22,6 @@ if __name__ == "__main__":
         "bind": _args.app_bind,
         "timeout": _args.app_timeout,
         "workers": _args.app_workers,
-        "worker_class": "uvicorn.workers.UvicornWorker"
+        # "worker_class": "uvicorn.workers.UvicornWorker"
     }
-    StandaloneApplication("oc_dms_mirror.application.wsgi:app", _options).run()
+    StandaloneApplication("app", _options, _args).run()

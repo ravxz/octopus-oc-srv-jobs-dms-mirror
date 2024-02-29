@@ -1,6 +1,6 @@
 import logging
-from oc_dms_mirror.application.app import create_app
-from oc_dms_mirror.application.config import Config
+from oc_dms_mirror.rest_api.app import create_app
+from oc_dms_mirror.rest_api.config import Config
 
 app = create_app(Config)
 
