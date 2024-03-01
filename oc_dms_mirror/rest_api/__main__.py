@@ -6,10 +6,10 @@ if __name__ == "__main__":
 
     _parser = argparse.ArgumentParser(description="Mirror artifacts from DMS to MVN", conflict_handler='resolve')
     DmsMirror().basic_args(_parser)
-    _parser.add_argument("--app-bind", dest="app_bind", type=str, help="<host:port> application binding",
+    _parser.add_argument("--ws-bind", dest="ws_bind", type=str, help="<host:port> WS binding",
                          default='0.0.0.0:5400')
-    _parser.add_argument("--app-timeout", dest="app_timeout", type=str, help="Application response timeout", default=300)
-    _parser.add_argument("--app-workers", dest="app_workers", type=int, help="Amount of application workers", default=10)
+    _parser.add_argument("--ws-timeout", dest="ws_timeout", type=str, help="WS response timeout", default=300)
+    _parser.add_argument("--ws-workers", dest="ws_workers", type=int, help="Amount of WS workers", default=10)
     _args = _parser.parse_args()
 
     if hasattr(_args, "log_level"):
@@ -19,9 +19,9 @@ if __name__ == "__main__":
         logging.info(f"Logging level is set to {_args.log_level}")
 
     _options = {
-        "bind": _args.app_bind,
-        "timeout": _args.app_timeout,
-        "workers": _args.app_workers,
+        "bind": _args.ws_bind,
+        "timeout": _args.ws_timeout,
+        "workers": _args.ws_workers,
         # "worker_class": "uvicorn.workers.UvicornWorker"
     }
     StandaloneApplication("app", _options, _args).run()

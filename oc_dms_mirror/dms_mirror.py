@@ -19,7 +19,7 @@ from oc_cdtapi import NexusAPI, DmsAPI
 from oc_cdtapi.API import HttpAPIError
 from requests.exceptions import ConnectionError
 
-class DmsMirror(object):
+class DmsMirror:
     """
     A class for artifacts mirroring from Dms API
     """
@@ -408,6 +408,12 @@ class DmsMirror(object):
                 _display_value = '*'*len(_v)
 
             logging.info(self.__log_msg(f"{_k.upper()}:\t[{_display_value}]"))
+
+    def init(self, args):
+        self.setup_from_args(args)
+        with open(self._args.config_file, mode='rt') as _config:
+            self._components = json.load(_config)
+
 
     def run(self):
         """

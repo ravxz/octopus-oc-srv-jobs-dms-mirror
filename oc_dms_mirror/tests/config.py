@@ -1,4 +1,4 @@
-class TestConfig(object):
+class TestConfig:
     DEBUG = False
     TESTING = True
 

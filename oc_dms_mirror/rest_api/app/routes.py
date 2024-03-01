@@ -7,9 +7,7 @@ import logging
 
 def get_dms_mirror():
     _dmsMirror = DmsMirror()
-    _dmsMirror.setup_from_args(current_app.args)
-    with open(_dmsMirror._args.config_file, mode='rt') as _config:
-        _dmsMirror._components = json.load(_config)
+    _dmsMirror.init(current_app.args)
     return _dmsMirror
 
 

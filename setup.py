@@ -14,8 +14,7 @@ setup(
         "oc-cdtapi >= 3.11.6",
         "oc-checksumsq >= 10.0.3",
         "flask",
-        "gunicorn",
-        "uvicorn"
+        "gunicorn"
     ],
     packages=["oc_dms_mirror"])
 
