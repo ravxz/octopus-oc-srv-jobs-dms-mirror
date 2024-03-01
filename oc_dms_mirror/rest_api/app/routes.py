@@ -7,7 +7,8 @@ import logging
 
 def get_dms_mirror():
     _dmsMirror = DmsMirror()
-    _dmsMirror.init(current_app.args)
+    _dmsMirror.setup_from_args(current_app.args)
+    _dmsMirror.load_config()
     return _dmsMirror
 
 

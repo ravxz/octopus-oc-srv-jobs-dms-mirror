@@ -409,8 +409,8 @@ class DmsMirror:
 
             logging.info(self.__log_msg(f"{_k.upper()}:\t[{_display_value}]"))
 
-    def init(self, args):
-        self.setup_from_args(args)
+
+    def load_config(self):
         with open(self._args.config_file, mode='rt') as _config:
             self._components = json.load(_config)
 
@@ -421,8 +421,7 @@ class DmsMirror:
         """
         logging.info(self.__log_msg(f"Reading components configuration: [{self._args.config_file}]"))
 
-        with open(self._args.config_file, mode='rt') as _config:
-            self._components = json.load(_config)
+        self.load_config()
 
         logging.info(self.__log_msg(f"Components to process: {len(self._components)}"))
 
