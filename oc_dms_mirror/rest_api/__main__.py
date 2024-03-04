@@ -21,7 +21,6 @@ if __name__ == "__main__":
     _options = {
         "bind": _args.ws_bind,
         "timeout": _args.ws_timeout,
-        "workers": _args.ws_workers,
-        # "worker_class": "uvicorn.workers.UvicornWorker"
+        "workers": _args.ws_workers
     }
     StandaloneApplication("app", _options, _args).run()

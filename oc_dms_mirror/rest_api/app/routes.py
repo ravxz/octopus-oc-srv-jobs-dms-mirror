@@ -24,6 +24,7 @@ def response_json(code, data):
     return Response(
         status=code,
         mimetype='application/json',
+        content_type='application/json',
         response=data)
 
 
@@ -34,9 +35,7 @@ def register_component_version_artifact():
     """
     logging.info(f"POST {request.url_rule.rule} from [{request.remote_addr}]")
     try:
-        _component = request.json.get('component')
-        _version = request.json.get('version')
-        get_dms_mirror().process_version(_version, _component)
+        get_dms_mirror().process_version(request.json['component'], request.json['version'])
     except Exception as _e:
         logging.exception(_e)
         return response_json(400, {"result": str(_e)})
